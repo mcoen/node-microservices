@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Legal Proceedings</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f7fb; color: #0f172a; }
+      .card { background: #fff; border: 1px solid #dbe3ef; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+      input, textarea, button { width: 100%; margin-top: .4rem; margin-bottom: .8rem; padding: .6rem; }
+      button { cursor: pointer; background: #1d4ed8; color: white; border: none; border-radius: 8px; }
+      table { width: 100%; border-collapse: collapse; background: #fff; }
+      th, td { border: 1px solid #dbe3ef; padding: .6rem; text-align: left; vertical-align: top; }
+      th { background: #eff6ff; }
+      .layout { display: grid; grid-template-columns: 360px 1fr; gap: 1rem; }
+      @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <h1>Legal Proceedings</h1>
+    <div class="layout">
+      <div class="card">
+        <h2>Create Proceeding</h2>
+        <form id="proceedingForm">
+          <label>Scheduled Date</label>
+          <input type="datetime-local" id="scheduledDate" required />
+
+          <label>Proceeding Type</label>
+          <input type="text" id="proceedingType" placeholder="Deposition" required />
+
+          <label>Client</label>
+          <input type="text" id="client" placeholder="Client name" required />
+
+          <label>Participants (comma separated)</label>
+          <textarea id="participants" rows="3" placeholder="Jane Doe, John Smith" required></textarea>
+
+          <label>Location</label>
+          <input type="text" id="location" placeholder="Remote / address" required />
+
+          <button type="submit">Create Proceeding</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Current Proceedings</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Created</th>
+              <th>Scheduled</th>
+              <th>Type</th>
+              <th>Client</th>
+              <th>Participants</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      async function loadProceedings() {
+        const resp = await fetch('/api/proceedings');
+        const data = await resp.json();
+        const rows = document.getElementById('rows');
+        rows.innerHTML = data
+          .map(
+            (p) => `
+              <tr>
+                <td>${p.id}</td>
+                <td>${new Date(p.createdDate).toLocaleString()}</td>
+                <td>${new Date(p.scheduledDate).toLocaleString()}</td>
+                <td>${p.proceedingType}</td>
+                <td>${p.client}</td>
+                <td>${(p.participants || []).join(', ')}</td>
+                <td>${p.location}</td>
+              </tr>
+            `
+          )
+          .join('');
+      }
+
+      document.getElementById('proceedingForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const body = {
+          scheduledDate: new Date(document.getElementById('scheduledDate').value).toISOString(),
+          proceedingType: document.getElementById('proceedingType').value,
+          client: document.getElementById('client').value,
+          participants: document.getElementById('participants').value,
+          location: document.getElementById('location').value,
+        };
+
+        const resp = await fetch('/api/proceedings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json();
+          alert(err.error || 'Failed to create proceeding');
+          return;
+        }
+
+        e.target.reset();
+        await loadProceedings();
+      });
+
+      loadProceedings();
+    </script>
+  </body>
+</html>

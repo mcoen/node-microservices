@@ -1,0 +1,41 @@
+[
+  {
+    "id": "p-1001",
+    "createdDate": "2026-04-10T13:18:22.403Z",
+    "scheduledDate": "2026-04-11T13:18:22.403Z",
+    "proceedingType": "Deposition",
+    "client": "Acme Holdings",
+    "participants": [
+      "Jane Doe",
+      "John Smith",
+      "Court Reporter"
+    ],
+    "location": "Remote (Zoom)"
+  },
+  {
+    "id": "p-1002",
+    "createdDate": "2026-04-10T13:18:22.403Z",
+    "scheduledDate": "2026-04-12T13:18:22.403Z",
+    "proceedingType": "Arbitration",
+    "client": "Northstar Logistics",
+    "participants": [
+      "Counsel A",
+      "Counsel B",
+      "Arbitrator"
+    ],
+    "location": "New York, NY"
+  },
+  {
+    "id": "p-1003",
+    "createdDate": "2026-04-10T13:18:22.403Z",
+    "scheduledDate": "2026-04-13T13:18:22.403Z",
+    "proceedingType": "Hearing",
+    "client": "Brightline Legal",
+    "participants": [
+      "Plaintiff",
+      "Defendant",
+      "Judge"
+    ],
+    "location": "Brooklyn Courthouse"
+  }
+]
