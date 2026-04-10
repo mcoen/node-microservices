@@ -7,12 +7,14 @@
     <style>
       body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f7fb; color: #0f172a; }
       .card { background: #fff; border: 1px solid #dbe3ef; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
-      input, textarea, button { width: 100%; margin-top: .4rem; margin-bottom: .8rem; padding: .6rem; }
+      input, textarea, select, button { width: 100%; margin-top: .4rem; margin-bottom: .8rem; padding: .6rem; }
       button { cursor: pointer; background: #1d4ed8; color: white; border: none; border-radius: 8px; }
       table { width: 100%; border-collapse: collapse; background: #fff; }
       th, td { border: 1px solid #dbe3ef; padding: .6rem; text-align: left; vertical-align: top; }
       th { background: #eff6ff; }
       .layout { display: grid; grid-template-columns: 360px 1fr; gap: 1rem; }
+      .error { color: #b91c1c; font-size: .9rem; margin-top: .25rem; }
+      .success { color: #166534; font-size: .9rem; margin-top: .25rem; }
       @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
     </style>
   </head>
@@ -26,7 +28,15 @@
           <input type="datetime-local" id="scheduledDate" required />
 
           <label>Proceeding Type</label>
-          <input type="text" id="proceedingType" placeholder="Deposition" required />
+          <select id="proceedingType" required>
+            <option value="">Select type</option>
+            <option>Deposition</option>
+            <option>Arbitration</option>
+            <option>Hearing</option>
+            <option>Mediation</option>
+            <option>Trial Preparation</option>
+            <option>Case Management Conference</option>
+          </select>
 
           <label>Client</label>
           <input type="text" id="client" placeholder="Client name" required />
@@ -38,6 +48,7 @@
           <input type="text" id="location" placeholder="Remote / address" required />
 
           <button type="submit">Create Proceeding</button>
+          <div id="formMessage"></div>
         </form>
       </div>
 
@@ -61,6 +72,18 @@
     </div>
 
     <script>
+      const messageEl = document.getElementById('formMessage');
+
+      function showMessage(text, type = 'error') {
+        messageEl.className = type === 'success' ? 'success' : 'error';
+        messageEl.textContent = text;
+      }
+
+      function clearMessage() {
+        messageEl.className = '';
+        messageEl.textContent = '';
+      }
+
       async function loadProceedings() {
         const resp = await fetch('/api/proceedings');
         const data = await resp.json();
@@ -84,8 +107,22 @@
 
       document.getElementById('proceedingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        clearMessage();
+
+        const scheduledRaw = document.getElementById('scheduledDate').value;
+        if (!scheduledRaw) {
+          showMessage('Scheduled date is required.');
+          return;
+        }
+
+        const scheduledDate = new Date(scheduledRaw);
+        if (Number.isNaN(scheduledDate.getTime())) {
+          showMessage('Scheduled date is invalid.');
+          return;
+        }
+
         const body = {
-          scheduledDate: new Date(document.getElementById('scheduledDate').value).toISOString(),
+          scheduledDate: scheduledDate.toISOString(),
           proceedingType: document.getElementById('proceedingType').value,
           client: document.getElementById('client').value,
           participants: document.getElementById('participants').value,
@@ -98,13 +135,16 @@
           body: JSON.stringify(body),
         });
 
+        let payload = {};
+        try { payload = await resp.json(); } catch { payload = {}; }
+
         if (!resp.ok) {
-          const err = await resp.json();
-          alert(err.error || 'Failed to create proceeding');
+          showMessage(payload.error || 'Failed to create proceeding');
           return;
         }
 
         e.target.reset();
+        showMessage('Proceeding created successfully.', 'success');
         await loadProceedings();
       });
 
