@@ -102,6 +102,10 @@
 
         <div class="card">
           <h2>Current Proceedings</h2>
+          <label>Filter by Matter</label>
+          <select id="filterMatterId">
+            <option value="">Select a matter to view proceedings</option>
+          </select>
           <table>
             <thead>
               <tr>
@@ -156,6 +160,14 @@
 
         const matterSelect = document.getElementById('matterId');
         matterSelect.innerHTML = data.map((m) => `<option value="${m.id}">${m.name} (${m.id})</option>`).join('');
+
+        const filterMatterSelect = document.getElementById('filterMatterId');
+        const existingFilter = filterMatterSelect.value;
+        filterMatterSelect.innerHTML = '<option value="">Select a matter to view proceedings</option>' +
+          data.map((m) => `<option value="${m.id}">${m.name} (${m.id})</option>`).join('');
+        if (existingFilter && data.some((m) => m.id === existingFilter)) {
+          filterMatterSelect.value = existingFilter;
+        }
       }
 
       async function loadProceedings() {
@@ -163,9 +175,21 @@
         const data = await resp.json();
         const proceedingRows = document.getElementById('proceedingRows');
 
-        const matterById = Object.fromEntries(matters.map((m) => [m.id, m.name]));
+        const selectedMatterId = document.getElementById('filterMatterId').value;
+        if (!selectedMatterId) {
+          proceedingRows.innerHTML = '<tr><td colspan="8">Select a matter to view related proceedings.</td></tr>';
+          return;
+        }
 
-        proceedingRows.innerHTML = data.map((p) => `
+        const matterById = Object.fromEntries(matters.map((m) => [m.id, m.name]));
+        const filtered = data.filter((p) => p.matterId === selectedMatterId);
+
+        if (filtered.length === 0) {
+          proceedingRows.innerHTML = '<tr><td colspan="8">No proceedings for the selected matter yet.</td></tr>';
+          return;
+        }
+
+        proceedingRows.innerHTML = filtered.map((p) => `
           <tr>
             <td>${p.id}</td>
             <td>${matterById[p.matterId] || p.matterId || '-'}</td>
@@ -207,6 +231,10 @@
         e.target.reset();
         setMsg(matterMessageEl, 'Matter created successfully.', 'success');
         await loadMatters();
+        await loadProceedings();
+      });
+
+      document.getElementById('filterMatterId').addEventListener('change', async () => {
         await loadProceedings();
       });
 
