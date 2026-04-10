@@ -55,6 +55,7 @@ function createProceeding({ scheduledDate, proceedingType, client, participants,
 
   const proceeding = {
     id: `p-${Date.now()}`,
+    matterId,
     createdDate,
     scheduledDate,
     proceedingType,

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Legal Proceedings</title>
+    <title>Matters & Proceedings</title>
     <style>
       body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f7fb; color: #0f172a; }
       .card { background: #fff; border: 1px solid #dbe3ef; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
@@ -12,117 +12,217 @@
       table { width: 100%; border-collapse: collapse; background: #fff; }
       th, td { border: 1px solid #dbe3ef; padding: .6rem; text-align: left; vertical-align: top; }
       th { background: #eff6ff; }
-      .layout { display: grid; grid-template-columns: 360px 1fr; gap: 1rem; }
+      .layout { display: grid; grid-template-columns: 380px 1fr; gap: 1rem; }
       .error { color: #b91c1c; font-size: .9rem; margin-top: .25rem; }
       .success { color: #166534; font-size: .9rem; margin-top: .25rem; }
-      @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+      @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
     </style>
   </head>
   <body>
-    <h1>Legal Proceedings</h1>
+    <h1>Matters & Proceedings</h1>
+
     <div class="layout">
-      <div class="card">
-        <h2>Create Proceeding</h2>
-        <form id="proceedingForm">
-          <label>Scheduled Date</label>
-          <input type="datetime-local" id="scheduledDate" required />
+      <div>
+        <div class="card">
+          <h2>Create Matter</h2>
+          <form id="matterForm">
+            <label>Matter Name</label>
+            <input type="text" id="matterName" required />
 
-          <label>Proceeding Type</label>
-          <select id="proceedingType" required>
-            <option value="">Select type</option>
-            <option>Deposition</option>
-            <option>Arbitration</option>
-            <option>Hearing</option>
-            <option>Mediation</option>
-            <option>Trial Preparation</option>
-            <option>Case Management Conference</option>
-          </select>
+            <label>Description</label>
+            <textarea id="matterDescription" rows="3" required></textarea>
 
-          <label>Client</label>
-          <input type="text" id="client" placeholder="Client name" required />
+            <label>Client</label>
+            <input type="text" id="matterClient" required />
 
-          <label>Participants (comma separated)</label>
-          <textarea id="participants" rows="3" placeholder="Jane Doe, John Smith" required></textarea>
+            <label>Status</label>
+            <select id="matterStatus">
+              <option>Open</option>
+              <option>Pending</option>
+              <option>Closed</option>
+            </select>
 
-          <label>Location</label>
-          <input type="text" id="location" placeholder="Remote / address" required />
+            <button type="submit">Create Matter</button>
+            <div id="matterMessage"></div>
+          </form>
+        </div>
 
-          <button type="submit">Create Proceeding</button>
-          <div id="formMessage"></div>
-        </form>
+        <div class="card">
+          <h2>Create Proceeding</h2>
+          <form id="proceedingForm">
+            <label>Matter</label>
+            <select id="matterId" required></select>
+
+            <label>Scheduled Date</label>
+            <input type="datetime-local" id="scheduledDate" required />
+
+            <label>Proceeding Type</label>
+            <select id="proceedingType" required>
+              <option value="">Select type</option>
+              <option>Deposition</option>
+              <option>Arbitration</option>
+              <option>Hearing</option>
+              <option>Mediation</option>
+              <option>Trial Preparation</option>
+              <option>Case Management Conference</option>
+            </select>
+
+            <label>Client</label>
+            <input type="text" id="client" placeholder="Client name" required />
+
+            <label>Participants (comma separated)</label>
+            <textarea id="participants" rows="3" placeholder="Jane Doe, John Smith" required></textarea>
+
+            <label>Location</label>
+            <input type="text" id="location" placeholder="Remote / address" required />
+
+            <button type="submit">Create Proceeding</button>
+            <div id="proceedingMessage"></div>
+          </form>
+        </div>
       </div>
 
-      <div class="card">
-        <h2>Current Proceedings</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Created</th>
-              <th>Scheduled</th>
-              <th>Type</th>
-              <th>Client</th>
-              <th>Participants</th>
-              <th>Location</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
+      <div>
+        <div class="card">
+          <h2>Current Matters</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Created</th>
+                <th>Name</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Proceedings</th>
+              </tr>
+            </thead>
+            <tbody id="matterRows"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Current Proceedings</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Matter</th>
+                <th>Created</th>
+                <th>Scheduled</th>
+                <th>Type</th>
+                <th>Client</th>
+                <th>Participants</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody id="proceedingRows"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <script>
-      const messageEl = document.getElementById('formMessage');
+      const matterMessageEl = document.getElementById('matterMessage');
+      const proceedingMessageEl = document.getElementById('proceedingMessage');
 
-      function showMessage(text, type = 'error') {
-        messageEl.className = type === 'success' ? 'success' : 'error';
-        messageEl.textContent = text;
+      let matters = [];
+
+      function setMsg(el, text, type = 'error') {
+        el.className = type === 'success' ? 'success' : 'error';
+        el.textContent = text;
       }
 
-      function clearMessage() {
-        messageEl.className = '';
-        messageEl.textContent = '';
+      function clearMsg(el) {
+        el.className = '';
+        el.textContent = '';
+      }
+
+      async function loadMatters() {
+        const resp = await fetch('/api/matters');
+        const data = await resp.json();
+        matters = data;
+
+        const matterRows = document.getElementById('matterRows');
+        matterRows.innerHTML = data.map((m) => `
+          <tr>
+            <td>${m.id}</td>
+            <td>${new Date(m.createdDate).toLocaleString()}</td>
+            <td>${m.name}</td>
+            <td>${m.client}</td>
+            <td>${m.status}</td>
+            <td>${m.proceedingCount}</td>
+          </tr>
+        `).join('');
+
+        const matterSelect = document.getElementById('matterId');
+        matterSelect.innerHTML = data.map((m) => `<option value="${m.id}">${m.name} (${m.id})</option>`).join('');
       }
 
       async function loadProceedings() {
         const resp = await fetch('/api/proceedings');
         const data = await resp.json();
-        const rows = document.getElementById('rows');
-        rows.innerHTML = data
-          .map(
-            (p) => `
-              <tr>
-                <td>${p.id}</td>
-                <td>${new Date(p.createdDate).toLocaleString()}</td>
-                <td>${new Date(p.scheduledDate).toLocaleString()}</td>
-                <td>${p.proceedingType}</td>
-                <td>${p.client}</td>
-                <td>${(p.participants || []).join(', ')}</td>
-                <td>${p.location}</td>
-              </tr>
-            `
-          )
-          .join('');
+        const proceedingRows = document.getElementById('proceedingRows');
+
+        const matterById = Object.fromEntries(matters.map((m) => [m.id, m.name]));
+
+        proceedingRows.innerHTML = data.map((p) => `
+          <tr>
+            <td>${p.id}</td>
+            <td>${matterById[p.matterId] || p.matterId || '-'}</td>
+            <td>${new Date(p.createdDate).toLocaleString()}</td>
+            <td>${new Date(p.scheduledDate).toLocaleString()}</td>
+            <td>${p.proceedingType}</td>
+            <td>${p.client}</td>
+            <td>${(p.participants || []).join(', ')}</td>
+            <td>${p.location}</td>
+          </tr>
+        `).join('');
       }
 
-      document.getElementById('proceedingForm').addEventListener('submit', async (e) => {
+      document.getElementById('matterForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        clearMessage();
+        clearMsg(matterMessageEl);
 
-        const scheduledRaw = document.getElementById('scheduledDate').value;
-        if (!scheduledRaw) {
-          showMessage('Scheduled date is required.');
+        const body = {
+          name: document.getElementById('matterName').value,
+          description: document.getElementById('matterDescription').value,
+          client: document.getElementById('matterClient').value,
+          status: document.getElementById('matterStatus').value,
+        };
+
+        const resp = await fetch('/api/matters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        let payload = {};
+        try { payload = await resp.json(); } catch {}
+
+        if (!resp.ok) {
+          setMsg(matterMessageEl, payload.error || 'Failed to create matter');
           return;
         }
 
-        const scheduledDate = new Date(scheduledRaw);
-        if (Number.isNaN(scheduledDate.getTime())) {
-          showMessage('Scheduled date is invalid.');
+        e.target.reset();
+        setMsg(matterMessageEl, 'Matter created successfully.', 'success');
+        await loadMatters();
+        await loadProceedings();
+      });
+
+      document.getElementById('proceedingForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMsg(proceedingMessageEl);
+
+        const scheduledRaw = document.getElementById('scheduledDate').value;
+        if (!scheduledRaw) {
+          setMsg(proceedingMessageEl, 'Scheduled date is required.');
           return;
         }
 
         const body = {
-          scheduledDate: scheduledDate.toISOString(),
+          matterId: document.getElementById('matterId').value,
+          scheduledDate: new Date(scheduledRaw).toISOString(),
           proceedingType: document.getElementById('proceedingType').value,
           client: document.getElementById('client').value,
           participants: document.getElementById('participants').value,
@@ -136,19 +236,23 @@
         });
 
         let payload = {};
-        try { payload = await resp.json(); } catch { payload = {}; }
+        try { payload = await resp.json(); } catch {}
 
         if (!resp.ok) {
-          showMessage(payload.error || 'Failed to create proceeding');
+          setMsg(proceedingMessageEl, payload.error || 'Failed to create proceeding');
           return;
         }
 
         e.target.reset();
-        showMessage('Proceeding created successfully.', 'success');
+        setMsg(proceedingMessageEl, 'Proceeding created successfully.', 'success');
+        await loadMatters();
         await loadProceedings();
       });
 
-      loadProceedings();
+      (async function init() {
+        await loadMatters();
+        await loadProceedings();
+      })();
     </script>
   </body>
 </html>

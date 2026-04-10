@@ -10,7 +10,8 @@
       "John Smith",
       "Court Reporter"
     ],
-    "location": "Remote (Zoom)"
+    "location": "Remote (Zoom)",
+    "matterId": "m-1001"
   },
   {
     "id": "p-1002",
@@ -23,7 +24,8 @@
       "Counsel B",
       "Arbitrator"
     ],
-    "location": "New York, NY"
+    "location": "New York, NY",
+    "matterId": "m-1001"
   },
   {
     "id": "p-1003",
@@ -36,7 +38,8 @@
       "Defendant",
       "Judge"
     ],
-    "location": "Brooklyn Courthouse"
+    "location": "Brooklyn Courthouse",
+    "matterId": "m-1001"
   },
   {
     "id": "p-1775841732337",
@@ -48,6 +51,7 @@
       "Mike Coen",
       "Bob Smith"
     ],
-    "location": "Morgantown, WV"
+    "location": "Morgantown, WV",
+    "matterId": "m-1001"
   }
 ]
