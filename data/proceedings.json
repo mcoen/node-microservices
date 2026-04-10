@@ -37,5 +37,17 @@
       "Judge"
     ],
     "location": "Brooklyn Courthouse"
+  },
+  {
+    "id": "p-1775841732337",
+    "createdDate": "2026-04-10T17:22:12.337Z",
+    "scheduledDate": "2026-05-01T17:21:00.000Z",
+    "proceedingType": "Deposition",
+    "client": "Bob's Furniture",
+    "participants": [
+      "Mike Coen",
+      "Bob Smith"
+    ],
+    "location": "Morgantown, WV"
   }
 ]
