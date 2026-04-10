@@ -53,5 +53,18 @@
     ],
     "location": "Morgantown, WV",
     "matterId": "m-1001"
+  },
+  {
+    "id": "p-1775853990897",
+    "matterId": "m-1001",
+    "createdDate": "2026-04-10T20:46:30.897Z",
+    "scheduledDate": "2026-04-11T16:00:00.000Z",
+    "proceedingType": "Deposition",
+    "client": "Acme Holdings",
+    "participants": [
+      "A",
+      "B"
+    ],
+    "location": "Remote"
   }
 ]

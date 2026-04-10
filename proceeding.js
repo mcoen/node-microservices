@@ -10,6 +10,7 @@ function ensureStore() {
     const seed = [
       {
         id: 'p-1001',
+        matterId: 'm-1001',
         createdDate: new Date().toISOString(),
         scheduledDate: new Date(Date.now() + 86400000).toISOString(),
         proceedingType: 'Deposition',
@@ -19,6 +20,7 @@ function ensureStore() {
       },
       {
         id: 'p-1002',
+        matterId: 'm-1002',
         createdDate: new Date().toISOString(),
         scheduledDate: new Date(Date.now() + 2 * 86400000).toISOString(),
         proceedingType: 'Arbitration',
@@ -28,6 +30,7 @@ function ensureStore() {
       },
       {
         id: 'p-1003',
+        matterId: 'm-1001',
         createdDate: new Date().toISOString(),
         scheduledDate: new Date(Date.now() + 3 * 86400000).toISOString(),
         proceedingType: 'Hearing',
@@ -49,7 +52,7 @@ function writeProceedings(proceedings) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(proceedings, null, 2));
 }
 
-function createProceeding({ scheduledDate, proceedingType, client, participants, location }) {
+function createProceeding({ matterId, scheduledDate, proceedingType, client, participants, location }) {
   const list = readProceedings();
   const createdDate = new Date().toISOString();
 
