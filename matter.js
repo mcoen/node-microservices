@@ -1,45 +1,38 @@
-const fs = require('fs');
-const path = require('path');
+const { readJson, writeJson } = require('./storage');
 
-const DATA_DIR = path.join(__dirname, 'data');
-const DATA_FILE = path.join(DATA_DIR, 'matters.json');
+const KEY = 'matters.json';
 
-function ensureMatterStore() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) {
-    const seed = [
-      {
-        id: 'm-1001',
-        createdDate: new Date().toISOString(),
-        name: 'Acme Holdings v. Northstar Logistics',
-        description: 'Commercial litigation matter involving contract dispute and damages.',
-        client: 'Acme Holdings',
-        status: 'Open',
-      },
-      {
-        id: 'm-1002',
-        createdDate: new Date().toISOString(),
-        name: 'Brightline Legal - Employment Arbitration',
-        description: 'Arbitration regarding employment termination and severance terms.',
-        client: 'Brightline Legal',
-        status: 'Open',
-      },
-    ];
-    fs.writeFileSync(DATA_FILE, JSON.stringify(seed, null, 2));
-  }
+function seedMatters() {
+  return [
+    {
+      id: 'm-1001',
+      createdDate: new Date().toISOString(),
+      name: 'Acme Holdings v. Northstar Logistics',
+      description: 'Commercial litigation matter involving contract dispute and damages.',
+      client: 'Acme Holdings',
+      status: 'Open',
+    },
+    {
+      id: 'm-1002',
+      createdDate: new Date().toISOString(),
+      name: 'Brightline Legal - Employment Arbitration',
+      description: 'Arbitration regarding employment termination and severance terms.',
+      client: 'Brightline Legal',
+      status: 'Open',
+    },
+  ];
 }
 
-function readMatters() {
-  ensureMatterStore();
-  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+async function ensureMatterStore() {
+  await readJson(KEY, seedMatters());
 }
 
-function writeMatters(matters) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(matters, null, 2));
+async function readMatters() {
+  return readJson(KEY, seedMatters());
 }
 
-function createMatter({ name, description, client, status = 'Open' }) {
-  const matters = readMatters();
+async function createMatter({ name, description, client, status = 'Open' }) {
+  const matters = await readMatters();
   const matter = {
     id: `m-${Date.now()}`,
     createdDate: new Date().toISOString(),
@@ -49,7 +42,7 @@ function createMatter({ name, description, client, status = 'Open' }) {
     status,
   };
   matters.push(matter);
-  writeMatters(matters);
+  await writeJson(KEY, matters);
   return matter;
 }
 
