@@ -7,9 +7,27 @@
     <style>
       body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f7fb; color: #0f172a; }
       .card { background: #fff; border: 1px solid #dbe3ef; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; overflow: hidden; }
-      input, textarea, select, button { width: 100%; margin-top: .4rem; margin-bottom: .8rem; padding: .6rem; box-sizing: border-box; max-width: 100%; min-width: 0; }
-      input[type="datetime-local"] { min-width: 0; width: 100%; }
-      button { cursor: pointer; background: #1d4ed8; color: white; border: none; border-radius: 8px; }
+      input, textarea, select, button {
+        display: block;
+        width: 100%;
+        margin-top: .4rem;
+        margin-bottom: .8rem;
+        padding: .6rem;
+        box-sizing: border-box;
+        max-width: 100%;
+        min-width: 0;
+        border: 1px solid #cfd8e3;
+        border-radius: 8px;
+        background: #fff;
+      }
+      input[type="datetime-local"] {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        inline-size: 100%;
+        max-inline-size: 100%;
+      }
+      button { cursor: pointer; background: #1d4ed8; color: white; border-radius: 8px; border: none; }
       table { width: 100%; border-collapse: collapse; background: #fff; }
       th, td { border: 1px solid #dbe3ef; padding: .6rem; text-align: left; vertical-align: top; }
       th { background: #eff6ff; }
