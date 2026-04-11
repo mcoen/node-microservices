@@ -20,13 +20,15 @@
         border-radius: 8px;
         background: #fff;
       }
-      #proceedingForm select,
-      #proceedingForm input[type="datetime-local"] {
-        width: calc(100% - 2px);
-        min-width: 0;
-        max-width: calc(100% - 2px);
-        inline-size: calc(100% - 2px);
-        max-inline-size: calc(100% - 2px);
+      #proceedingForm .control {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+      #proceedingForm input[type="datetime-local"].control {
+        appearance: none;
+        -webkit-appearance: none;
       }
       button { cursor: pointer; background: #1d4ed8; color: white; border-radius: 8px; border: none; }
       table { width: 100%; border-collapse: collapse; background: #fff; }
@@ -71,10 +73,10 @@
           <h2>Create Proceeding</h2>
           <form id="proceedingForm">
             <label>Matter</label>
-            <select id="matterId" required></select>
+            <select id="matterId" class="control" required></select>
 
             <label>Scheduled Date</label>
-            <input type="datetime-local" id="scheduledDate" required />
+            <input type="datetime-local" id="scheduledDate" class="control" required />
 
             <label>Proceeding Type</label>
             <select id="proceedingType" required>
