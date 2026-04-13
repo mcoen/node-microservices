@@ -1,0 +1,16 @@
+[
+  {
+    "id": "participant-1001",
+    "createdDate": "2026-04-13T14:53:13.431Z",
+    "personId": "person-1001",
+    "userId": "user-1001",
+    "participantType": "Attorney"
+  },
+  {
+    "id": "participant-1002",
+    "createdDate": "2026-04-13T14:53:13.431Z",
+    "personId": "person-1002",
+    "userId": null,
+    "participantType": "Witness"
+  }
+]

@@ -45,7 +45,7 @@ async function readProceedings() {
   return readJson(KEY, seedProceedings());
 }
 
-async function createProceeding({ matterId, scheduledDate, proceedingType, client, participants, location }) {
+async function createProceeding({ matterId, scheduledDate, proceedingType, client, participantIds = [], participants = [], location }) {
   const list = await readProceedings();
   const createdDate = new Date().toISOString();
 
@@ -56,6 +56,7 @@ async function createProceeding({ matterId, scheduledDate, proceedingType, clien
     scheduledDate,
     proceedingType,
     client,
+    participantIds: Array.isArray(participantIds) ? participantIds : [],
     participants: Array.isArray(participants)
       ? participants
       : String(participants)

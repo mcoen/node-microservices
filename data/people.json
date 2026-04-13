@@ -1,0 +1,18 @@
+[
+  {
+    "id": "person-1001",
+    "createdDate": "2026-04-13T14:53:13.431Z",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane.doe@example.com",
+    "phone": "555-1001"
+  },
+  {
+    "id": "person-1002",
+    "createdDate": "2026-04-13T14:53:13.431Z",
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@example.com",
+    "phone": "555-1002"
+  }
+]

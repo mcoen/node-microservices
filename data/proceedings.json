@@ -66,5 +66,33 @@
       "B"
     ],
     "location": "Remote"
+  },
+  {
+    "id": "p-1775854395713",
+    "matterId": "m-1002",
+    "createdDate": "2026-04-10T20:53:15.713Z",
+    "scheduledDate": "2026-05-04T20:52:00.000Z",
+    "proceedingType": "Arbitration",
+    "client": "Fred's Furniture Outlet",
+    "participants": [
+      "Mike Coen",
+      "Fred Flintstone"
+    ],
+    "location": "Pittsburgh, PA"
+  },
+  {
+    "id": "p-1776091994311",
+    "matterId": "m-1001",
+    "createdDate": "2026-04-13T14:53:14.311Z",
+    "scheduledDate": "2026-04-15T16:00:00.000Z",
+    "proceedingType": "Deposition",
+    "client": "Acme Holdings",
+    "participantIds": [
+      "participant-1001"
+    ],
+    "participants": [
+      "Jane Doe"
+    ],
+    "location": "Remote"
   }
 ]

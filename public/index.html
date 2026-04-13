@@ -20,24 +20,16 @@
         border-radius: 8px;
         background: #fff;
       }
-      #proceedingForm .control {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-      }
-      #proceedingForm input[type="datetime-local"].control {
-        appearance: none;
-        -webkit-appearance: none;
-      }
       button { cursor: pointer; background: #1d4ed8; color: white; border-radius: 8px; border: none; }
       table { width: 100%; border-collapse: collapse; background: #fff; }
       th, td { border: 1px solid #dbe3ef; padding: .6rem; text-align: left; vertical-align: top; }
       th { background: #eff6ff; }
-      .layout { display: grid; grid-template-columns: 380px 1fr; gap: 1rem; }
+      .layout { display: grid; grid-template-columns: 420px 1fr; gap: 1rem; }
       .error { color: #b91c1c; font-size: .9rem; margin-top: .25rem; }
       .success { color: #166534; font-size: .9rem; margin-top: .25rem; }
-      @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+      .muted { font-size: .85rem; color: #64748b; margin-top: -.5rem; margin-bottom: .8rem; }
+      .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+      @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } .grid2 { grid-template-columns:1fr; } }
     </style>
   </head>
   <body>
@@ -45,6 +37,40 @@
 
     <div class="layout">
       <div>
+        <div class="card">
+          <h2>Create Participant (Person-based)</h2>
+          <form id="participantForm">
+            <div class="grid2">
+              <div>
+                <label>First Name</label>
+                <input type="text" id="participantFirstName" required />
+              </div>
+              <div>
+                <label>Last Name</label>
+                <input type="text" id="participantLastName" required />
+              </div>
+            </div>
+
+            <label>Email</label>
+            <input type="email" id="participantEmail" required />
+
+            <label>Phone</label>
+            <input type="text" id="participantPhone" />
+
+            <label>Participant Type</label>
+            <select id="participantType">
+              <option>Attorney</option>
+              <option>Witness</option>
+              <option>Court Reporter</option>
+              <option>Client Representative</option>
+              <option>Observer</option>
+            </select>
+
+            <button type="submit">Create Participant</button>
+            <div id="participantMessage"></div>
+          </form>
+        </div>
+
         <div class="card">
           <h2>Create Matter</h2>
           <form id="matterForm">
@@ -73,10 +99,10 @@
           <h2>Create Proceeding</h2>
           <form id="proceedingForm">
             <label>Matter</label>
-            <select id="matterId" class="control" required></select>
+            <select id="matterId" required></select>
 
             <label>Scheduled Date</label>
-            <input type="datetime-local" id="scheduledDate" class="control" required />
+            <input type="datetime-local" id="scheduledDate" required />
 
             <label>Proceeding Type</label>
             <select id="proceedingType" required>
@@ -92,8 +118,9 @@
             <label>Client</label>
             <input type="text" id="client" placeholder="Client name" required />
 
-            <label>Participants (comma separated)</label>
-            <textarea id="participants" rows="3" placeholder="Jane Doe, John Smith" required></textarea>
+            <label>Participants</label>
+            <select id="participantIds" multiple size="6" required></select>
+            <div class="muted">Hold Ctrl/Cmd to select multiple participants.</div>
 
             <label>Location</label>
             <input type="text" id="location" placeholder="Remote / address" required />
@@ -119,6 +146,21 @@
               </tr>
             </thead>
             <tbody id="matterRows"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Current Participants</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody id="participantRows"></tbody>
           </table>
         </div>
 
@@ -150,8 +192,10 @@
     <script>
       const matterMessageEl = document.getElementById('matterMessage');
       const proceedingMessageEl = document.getElementById('proceedingMessage');
+      const participantMessageEl = document.getElementById('participantMessage');
 
       let matters = [];
+      let participants = [];
 
       function setMsg(el, text, type = 'error') {
         el.className = type === 'success' ? 'success' : 'error';
@@ -161,6 +205,25 @@
       function clearMsg(el) {
         el.className = '';
         el.textContent = '';
+      }
+
+      async function loadParticipants() {
+        const resp = await fetch('/api/participants');
+        const data = await resp.json();
+        participants = data;
+
+        const participantRows = document.getElementById('participantRows');
+        participantRows.innerHTML = data.map((p) => `
+          <tr>
+            <td>${p.id}</td>
+            <td>${p.displayName}</td>
+            <td>${p.email || ''}</td>
+            <td>${p.participantType}</td>
+          </tr>
+        `).join('');
+
+        const participantSelect = document.getElementById('participantIds');
+        participantSelect.innerHTML = data.map((p) => `<option value="${p.id}">${p.displayName} (${p.participantType})</option>`).join('');
       }
 
       async function loadMatters() {
@@ -219,11 +282,42 @@
             <td>${new Date(p.scheduledDate).toLocaleString()}</td>
             <td>${p.proceedingType}</td>
             <td>${p.client}</td>
-            <td>${(p.participants || []).join(', ')}</td>
+            <td>${(p.participantNames || p.participants || []).join(', ')}</td>
             <td>${p.location}</td>
           </tr>
         `).join('');
       }
+
+      document.getElementById('participantForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMsg(participantMessageEl);
+
+        const body = {
+          firstName: document.getElementById('participantFirstName').value,
+          lastName: document.getElementById('participantLastName').value,
+          email: document.getElementById('participantEmail').value,
+          phone: document.getElementById('participantPhone').value,
+          participantType: document.getElementById('participantType').value,
+        };
+
+        const resp = await fetch('/api/participants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        let payload = {};
+        try { payload = await resp.json(); } catch {}
+
+        if (!resp.ok) {
+          setMsg(participantMessageEl, payload.error || 'Failed to create participant');
+          return;
+        }
+
+        e.target.reset();
+        setMsg(participantMessageEl, 'Participant created successfully.', 'success');
+        await loadParticipants();
+      });
 
       document.getElementById('matterForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -270,12 +364,18 @@
           return;
         }
 
+        const selectedParticipants = Array.from(document.getElementById('participantIds').selectedOptions).map((o) => o.value);
+        if (selectedParticipants.length === 0) {
+          setMsg(proceedingMessageEl, 'Select at least one participant.');
+          return;
+        }
+
         const body = {
           matterId: document.getElementById('matterId').value,
           scheduledDate: new Date(scheduledRaw).toISOString(),
           proceedingType: document.getElementById('proceedingType').value,
           client: document.getElementById('client').value,
-          participants: document.getElementById('participants').value,
+          participantIds: selectedParticipants,
           location: document.getElementById('location').value,
         };
 
@@ -300,6 +400,7 @@
       });
 
       (async function init() {
+        await loadParticipants();
         await loadMatters();
         await loadProceedings();
       })();
